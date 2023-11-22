@@ -57,7 +57,7 @@ def time_out(e):
 
 # Boy Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
-RUN_SPEED_KMPH = 20.0  # Km / Hour
+RUN_SPEED_KMPH = 40.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -254,6 +254,8 @@ class StateMachine:
         self.boy.y += math.sin(self.boy.dir) * self.boy.speed * game_framework.frame_time
 
         # fill here
+        self.boy.x = clamp(50,self.boy.x,self.boy.bg.w - 50)
+        self.boy.y = clamp(50,self.boy.y,self.boy.bg.h - 50)
 
     def handle_event(self, e):
         for check_event, next_state in self.transitions[self.cur_state].items():
@@ -278,6 +280,9 @@ class Boy:
 
     def set_background(self, bg):
         # fill here
+        self.bg = bg
+        self.x = self.bg.w // 2
+        self.y = self.bg.h // 2
         pass
 
     def update(self):
@@ -288,11 +293,17 @@ class Boy:
 
     def draw(self):
         # fill here
+        sx, sy = self.x - self.bg.window_left, self.y - self.bg.window_bottom
+        self.image.clip_draw(int(self.frame) * 100, self.action * 100, 100, 100
+                             , sx, sy)
+        self.font.draw(sx - 10,sy + 60, f'{self.ball_count}',(0,0,255))
+        draw_rectangle(*self.get_bb())
         pass
 
     def get_bb(self):
-        return self.x - 20, self.y - 50, self.x + 20, self.y + 50
-
+        sx, sy = self.x - self.bg.window_left, self.y - self.bg.window_bottom
+        return sx - 20, sy - 50, sx + 20, sy + 50
+    
     # fill here
     def handle_collision(self, group, other):
         pass

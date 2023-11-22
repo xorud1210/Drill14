@@ -9,14 +9,24 @@ class FixedBackground:
     def __init__(self):
         self.image = load_image('futsal_court.png')
         # fill here
+        self.cw = get_canvas_width() # 화면 너비
+        self.ch = get_canvas_height() # 화면 높이
+        self.w = self.image.w # 배경 너비
+        self.h = self.image.h # 배경 높이
         pass
 
     def draw(self):
         # fill here
+        self.image.clip_draw_to_origin(self.window_left, self.window_bottom, self.cw, self.ch, 0, 0)
         pass
 
     def update(self):
         # fill here
+        self.window_left = int(server.boy.x) - self.cw // 2
+        self.window_left = clamp(0,self.window_left,self.w - self.cw - 1)
+
+        self.window_bottom = int(server.boy.y) - self.ch // 2
+        self.window_bottom = clamp(0,self.window_bottom,self.h - self.ch - 1)
         pass
 
     def handle_event(self, event):
@@ -36,7 +46,7 @@ class TileBackground:
         self.h = 600 * 3
 
         # fill here
-
+        self.tiles = [[load_image('cube%d%d.png' % (x, y)) for x in range(3)] for y in range(3)]
 
 
     def update(self):
@@ -47,6 +57,18 @@ class TileBackground:
         self.window_bottom = clamp(0, int(server.boy.y) - self.ch // 2, self.h - self.ch - 1)
 
         # fill here
+        tile_left = self.window_left // 800
+        tile_right = (self.window_left + self.cw) // 800
+        left_offset = self.window_left % 800
+
+        tile_bottom = self.window_bottom // 600
+        tile_top = (self.window_bottom + self.ch) // 600
+        bottom_offset = self.window_bottom % 600
+
+        for ty in range(tile_bottom,tile_top + 1):
+            for tx in range(tile_left,tile_right + 1):
+                self.tiles[ty][tx].draw_to_origin(-left_offset + (tx - tile_left) * 800,
+                                                  -bottom_offset + (ty - tile_bottom) * 600)
         pass
 
 
